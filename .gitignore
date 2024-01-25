@@ -1,3 +1,6 @@
+# Watched folder, for checking latest versions
+watched/**
+watched
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
