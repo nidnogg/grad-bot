@@ -38,24 +38,28 @@ def fetch_itau():
         print(f"Request failed with status code: {response.status_code}")
 
 def compare_with_older(site, payload):
-    # Prints nothing
-    print(payload)
     script_directory = os.path.dirname(os.path.realpath(__file__))
     watched_folder = os.path.join(script_directory, "watched")
     watched_file = os.path.join(watched_folder, f"{site}_latest.json")
     try:
-        with open(watched_file, "r") as latest_file:
+        with open(watched_file, "r+") as latest_file:
             content = latest_file.read()
-            print(content)
+            parsed_latest_file_json = json.loads(content)
+            import pdb; pdb.set_trace()
+            if parsed_latest_file_json == payload:
+                # Do nothing here, no delta since last checkup.
+                print("bloop")
+            else:
+                # Move cursor to the beginning of the file, dump and truncate any remaining content post write
+                latest_file.seek(0)  
+                json.dump(payload, latest_file, indent=2)  
+                latest_file.truncate() 
     except FileNotFoundError:
         print("Currently not watched. Generating latest version...")
          # Ensure the directory structure exists
         if not os.path.exists(watched_folder):
             os.makedirs(watched_folder)
         with open(watched_file, "w") as latest_file:
-            # Doesnt print anything
-            print(payload)
             json.dump(payload, latest_file, indent=2)
             print("Latest version generated and saved.")
-
 fetch_itau()
