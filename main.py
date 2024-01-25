@@ -25,12 +25,8 @@ def fetch_itau():
     print("Fetching JSON from ", url)
     response = requests.get(url, headers=headers)
 
-    # Check if the request was successful (status code 200)
     if response.status_code == 200:
         data = response.json()  # Retrieve JSON response
-        # Process 'data' as needed
-        # print(data)
-        # Formatted
         payload = data
         print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
         compare_with_older("itaucultural", payload)
