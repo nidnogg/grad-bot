@@ -30,13 +30,13 @@ def fetch_itau():
         data = response.json()  # Retrieve JSON response
         payload = data
         print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
-        compare_with_older("itaucultural", payload)
+        checksum_diff("itaucultural", payload)
     else:
         print(f"Request failed with status code: {response.status_code}")
 
-def compare_with_older(site, payload):
+def checksum_diff(site, payload):
     """
-    Compares the checksum of the current payload with the latest stored payload for a given site.
+    Compares the md5 checksum of the current payload with the latest stored payload for a given site.
 
     Parameters:
         site (str): Name of the site for comparison.
@@ -46,7 +46,8 @@ def compare_with_older(site, payload):
         FileNotFoundError: If latest file for the site is not found.
 
     Returns:
-        None
+        True: if md5 checksum differs from the latest stored payload
+        False: if md5 checksum is the same as the latest stored payload
     """
     script_directory = os.path.dirname(os.path.realpath(__file__))
     watched_folder = os.path.join(script_directory, "watched")
@@ -86,6 +87,8 @@ def compare_with_older(site, payload):
         print("Replacing latest file")
         with open(latest_filepath, "w") as latest_file:
             json.dump(payload[0], latest_file, indent=2, sort_keys=True)
+            latest_file.close()
+        return True
 
 def calculate_checksum(filepath):
     """Calculate checksum of a file."""
@@ -95,4 +98,6 @@ def calculate_checksum(filepath):
     except FileNotFoundError:
         print(f"File '{filepath}' not found.")
         return None
+
+
 fetch_itau()
