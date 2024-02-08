@@ -4,74 +4,90 @@ import logging
 import schedule
 import time
 from fetchers import check_itau
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from dotenv import load_dotenv
+from telegram import ForceReply, Update
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    ContextTypes,
+    MessageHandler,
+    filters,
+)
 
-# Set up logging
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
+# Enable logging
+logging.basicConfig(
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
+)
+
+# Set higher logging level for httpx to avoid all GET and POST requests being logged
+logging.getLogger("httpx").setLevel(logging.WARNING)
+logger = logging.getLogger(__name__)
 
 # List to store subscribed user chat IDs
 subscribed_users = []
 
-def start(update, context):
-    update.message.reply_text("Welcome to the Subscription Bot! Send /subscribe to subscribe to updates.")
+async def start(update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send a message when the command /start is issued."""
+    await update.message.reply_text(
+        "Currently watched websites are: ",
+        parse_mode="MarkdownV2"
+    )
 
-def subscribe(update, context):
+
+async def subscribe(update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.chat_id
     if user_id not in subscribed_users:
         subscribed_users.append(user_id)
-    update.message.reply_text("You have subscribed to updates.")
+    await update.message.reply_text("You have subscribed to updates.")
 
-def unsubscribe(update, context):
+async def unsubscribe(update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.chat_id
     if user_id in subscribed_users:
         subscribed_users.remove(user_id)
-    update.message.reply_text("You have unsubscribed from updates.")
+    await update.message.reply_text("You have unsubscribed from updates.")
 
-def echo(update, context):
-    update.message.reply_text("Unknown command. Send /start to begin.")
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send a message when the command /help is issued."""
+    await update.message.reply_text("Help!")
 
-def send_message_to_subscribers(bot, message):
+async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Echo the user message."""
+    await update.message.reply_text(update.message.text)
+
+async def send_message_to_subscribers(bot, message):
     for user_id in subscribed_users:
-        bot.send_message(chat_id=user_id, text=message)
-    
+        await bot.send_message(chat_id=user_id, text=message)
+
 def main():
     load_dotenv()
     TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")
-    updater = Updater(TELEGRAM_BOT_TOKEN, use_context=True)
+    app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
-    # Get the dispatcher to register handlers
-    dp = updater.dispatcher
-
-    # Register command handlers
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("subscribe", subscribe))
-    dp.add_handler(CommandHandler("unsubscribe", unsubscribe))
+    # Command handlers setup
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("subscribe", subscribe))
+    app.add_handler(CommandHandler("unsubscribe", unsubscribe))
 
     # Register a default message handler for unknown commands
-    dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
-    # Run the check_itau function every hour (adjust interval as needed)
-    # You can use a scheduler library like `schedule` for more advanced scheduling
-    def scan_job():
+    async def scan_job():
         if check_itau():
             diffed_url = "https://escola.itaucultural.org.br/mediados"
-            send_message_to_subscribers(updater.bot, f"Updates on {diffed_url}")
-            # Send a message to all subscribed users about the update
-            pass  # Implement sending message to subscribers
+            await send_message_to_subscribers(app.bot, f"Updates on {diffed_url}")
+        pass  
 
-    # Start the Bot
-    updater.start_polling()
-    schedule.every().hour.do(scan_job) 
-    updater.idle()
+    # Starts bot
+    app.run_polling(allowed_updates=Update.ALL_TYPES)    
+    schedule.every().hour.do(scan_job)
+    # Run the bot until Ctrl-C is pressed
+    app.idle()
     while True:
         schedule.run_pending()
+        logger.debug("Running")
         time.sleep(1)
-        
-    # Run the bot until you press Ctrl-C
 
-if __name__ == '__main__':
+
+
+if __name__ == "__main__":
     main()
-
-
-
