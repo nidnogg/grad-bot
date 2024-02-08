@@ -30,7 +30,14 @@ def fetch_itau():
         data = response.json()  # Retrieve JSON response
         payload = data
         print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
-        checksum_diff("itaucultural", payload)
+        if checksum_diff("itaucultural", payload):
+            print(f"Changes detected on url {url}")
+            
+
+            
+        else:
+            print(f"No changes detected on url {url}")
+
     else:
         print(f"Request failed with status code: {response.status_code}")
 
