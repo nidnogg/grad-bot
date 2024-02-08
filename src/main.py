@@ -26,12 +26,21 @@ logger = logging.getLogger(__name__)
 # List to store subscribed user chat IDs
 subscribed_users = []
 
+# Watched websites
+watched_websites = [
+    "https://escola.itaucultural.org.br/mediados",
+    "https://escola.itaucultural.org.br/mediados_test",
+]
+
+
 async def start(update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Send a message when the command /start is issued."""
-    await update.message.reply_text(
-        "Currently watched websites are: ",
-        parse_mode="MarkdownV2"
-    )
+    """Assembles list of watched websites and send a message when the command /start is issued."""
+
+    websites_message = "<b>Currently watched websites are:</b>\n\n"
+    for url in watched_websites:
+        websites_message += f"{url}\n"
+
+    await update.message.reply_text(websites_message, parse_mode="HTML")
 
 
 async def subscribe(update, context: ContextTypes.DEFAULT_TYPE):
@@ -40,23 +49,28 @@ async def subscribe(update, context: ContextTypes.DEFAULT_TYPE):
         subscribed_users.append(user_id)
     await update.message.reply_text("You have subscribed to updates.")
 
+
 async def unsubscribe(update, context: ContextTypes.DEFAULT_TYPE):
     user_id = update.message.chat_id
     if user_id in subscribed_users:
         subscribed_users.remove(user_id)
     await update.message.reply_text("You have unsubscribed from updates.")
 
+
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     await update.message.reply_text("Help!")
+
 
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
+
 async def send_message_to_subscribers(bot, message):
     for user_id in subscribed_users:
         await bot.send_message(chat_id=user_id, text=message)
+
 
 def main():
     load_dotenv()
@@ -75,10 +89,10 @@ def main():
         if check_itau():
             diffed_url = "https://escola.itaucultural.org.br/mediados"
             await send_message_to_subscribers(app.bot, f"Updates on {diffed_url}")
-        pass  
+        pass
 
     # Starts bot
-    app.run_polling(allowed_updates=Update.ALL_TYPES)    
+    app.run_polling(allowed_updates=Update.ALL_TYPES)
     schedule.every().hour.do(scan_job)
     # Run the bot until Ctrl-C is pressed
     app.idle()
@@ -86,7 +100,6 @@ def main():
         schedule.run_pending()
         logger.debug("Running")
         time.sleep(1)
-
 
 
 if __name__ == "__main__":
