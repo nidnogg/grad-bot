@@ -1,7 +1,5 @@
 import os
 import logging
-import schedule
-import time
 from fetchers import check_itau
 from helpers import get_users, store_user, remove_user
 from dotenv import load_dotenv
@@ -32,13 +30,8 @@ watched_websites = [
     "https://escola.itaucultural.org.br/mediados_test",
 ]
 
-available_commands = [
-    "/start",
-    "/subscribe",
-    "/unsubscribe",
-    "/help",
-    "/scan"
-]
+available_commands = ["/start", "/subscribe", "/unsubscribe", "/help", "/scan"]
+
 
 async def start(update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Assembles list of watched websites and send a message when the command /start is issued."""
@@ -78,24 +71,47 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     await update.message.reply_text(help_message, parse_mode="HTML")
 
+
 async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
+
 async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Scan website for user"""
-    await update.message.reply_text("Scanning for updates...", )
+    await update.message.reply_text(
+        "Scanning for updates...",
+    )
     if check_itau():
         diffed_url = "https://escola.itaucultural.org.br/mediados"
-        await update.message.reply_text(f"&#10071; <b>Updates found on {diffed_url}</b>", parse_mode="HTML")
+        await update.message.reply_text(
+            f"&#10071; <b>Updates found on:</b> {diffed_url}", parse_mode="HTML"
+        )
     else:
         diffed_url = "https://escola.itaucultural.org.br/mediados"
-        await update.message.reply_text(f"&#9203; <b>No updates found on {diffed_url}</b>", parse_mode="HTML")
+        await update.message.reply_text(
+            f"&#9203; <b>No updates found on {diffed_url}</b>", parse_mode="HTML"
+        )
     pass
+
 
 async def send_message_to_subscribers(bot, message):
     for user_id in subscribed_users:
-        await bot.send_message(chat_id=user_id, text=message)
+        await bot.send_message(chat_id=user_id, text=message, parse_mode="HTML")
+
+
+def remove_job_if_exists(name: str, context: ContextTypes.DEFAULT_TYPE) -> bool:
+    """Remove job with given name. Returns whether job was removed."""
+    current_jobs = context.job_queue.get_jobs_by_name(name)
+
+    if not current_jobs:
+        return False
+
+    for job in current_jobs:
+        job.schedule_removal()
+
+    return True
+
 
 def main():
     load_dotenv()
@@ -109,25 +125,27 @@ def main():
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("scan", scan))
 
-
     # Register a default message handler for unknown commands
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))
 
-    async def scan_job():
+    async def scan_job(context: ContextTypes.DEFAULT_TYPE):
+        logger.info("Triggering scan job")
+        # Checks go here
+        ################################################################
         if check_itau():
             diffed_url = "https://escola.itaucultural.org.br/mediados"
-            await send_message_to_subscribers(app.bot, f"Updates on {diffed_url}")
+            await send_message_to_subscribers(
+                app.bot, f"&#10071;<b>Updates found on: </b>{diffed_url}"
+            )
+        # End of checks
+        ################################################################
         pass
-
-    # Starts bot
+    # Schedule scan jobs
+    app.job_queue.run_once(scan_job, 20)
+    app.job_queue.run_repeating(scan_job, 3600)
+    
+    # Starts and runs the bot until Ctrl-C is pressed
     app.run_polling(allowed_updates=Update.ALL_TYPES)
-    schedule.every().hour.do(scan_job)
-    # Run the bot until Ctrl-C is pressed
-    app.idle()
-    while True:
-        schedule.run_pending()
-        logger.debug("Running")
-        time.sleep(1)
 
 
 if __name__ == "__main__":
