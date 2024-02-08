@@ -54,22 +54,18 @@ def remove_user(user_id):
         with open(users_filepath, "r+") as users_file:   
             content = users_file.read()
             user_data = json.loads(content)
-            if user_id not in user_data:
-              user_data.append(user_id)
-
+            for current_user in user_data:
+              if user_id == current_user:
+                  user_data.remove(current_user)
+                  break
             users_file.seek(0)
             users_file.truncate() 
             users_file.flush() 
             json.dump(user_data, users_file, indent=2, sort_keys=True)
 
     except FileNotFoundError:
-        print("No users currently created. Creating corresponding data folders with current user...")
-        # Ensure the directory structure exists
-        if not os.path.exists(data_folder):
-            os.makedirs(data_folder)
-        with open(users_filepath, "w") as users_file:
-            json.dump([user_id], users_file, indent=2, sort_keys=True)
-            print("Latest version generated and saved.")
+        print("No users currently exist. Cannot delete from an empty list.")
+        pass
        
 def checksum_diff(site, payload):
     """
