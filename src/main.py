@@ -71,7 +71,6 @@ async def send_message_to_subscribers(bot, message):
     for user_id in subscribed_users:
         await bot.send_message(chat_id=user_id, text=message)
 
-
 def main():
     load_dotenv()
     TELEGRAM_BOT_TOKEN = os.environ.get("TELEGRAM_BOT_TOKEN")

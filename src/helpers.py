@@ -2,6 +2,27 @@ import os
 import json
 import hashlib
 
+def store_user(user_id):
+    script_directory = os.path.dirname(os.path.realpath(__file__))
+    parent_directory = os.path.dirname(script_directory)
+    data_folder = os.path.join(parent_directory, "data")  
+    users_filepath = os.path.join(data_folder, f"user_ids.json")
+    try:
+        with open(users_filepath, "r") as users_file:   
+            
+            
+
+    except FileNotFoundError:
+        print("No users currently created. Creating corresponding data folders with current user...")
+        # Ensure the directory structure exists
+        if not os.path.exists(data_folder):
+            os.makedirs(data_folder)
+        with open(users_filepath, "w") as latest_file:
+            users = [user_id]
+            json.dump(user_id, latest_file, indent=2, sort_keys=True)
+            print("Latest version generated and saved.")
+
+          
 def checksum_diff(site, payload):
     """
     Compares the md5 checksum of the current payload with the latest stored payload for a given site.

@@ -1,3 +1,6 @@
+# Data folder, for storing user IDs atm
+data/**
+data
 # Watched folder, for checking latest versions
 watched/**
 watched
