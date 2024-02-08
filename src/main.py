@@ -1,11 +1,10 @@
-import requests
 import os
 import logging
 import schedule
 import time
 from fetchers import check_itau
 from dotenv import load_dotenv
-from telegram import ForceReply, Update
+from telegram import Update
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -66,6 +65,14 @@ async def echo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Echo the user message."""
     await update.message.reply_text(update.message.text)
 
+async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Scan website for user"""
+    if check_itau():
+        diffed_url = "https://escola.itaucultural.org.br/mediados"
+        await update.message.reply_text(f"U+2757 <b>Updates found on {diffed_url}</b>", parse_mode="HTML")
+    else:
+        await update.message.reply_text(f"U+274E <b> No updates found on {diffed_url}</b>", parse_mode="HTML")
+    pass
 
 async def send_message_to_subscribers(bot, message):
     for user_id in subscribed_users:
@@ -80,6 +87,7 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("subscribe", subscribe))
     app.add_handler(CommandHandler("unsubscribe", unsubscribe))
+    app.add_handler(CommandHandler("help", help))
 
     # Register a default message handler for unknown commands
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo))

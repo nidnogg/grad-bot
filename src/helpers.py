@@ -2,27 +2,75 @@ import os
 import json
 import hashlib
 
-def store_user(user_id):
-    script_directory = os.path.dirname(os.path.realpath(__file__))
-    parent_directory = os.path.dirname(script_directory)
-    data_folder = os.path.join(parent_directory, "data")  
-    users_filepath = os.path.join(data_folder, f"user_ids.json")
+# Main filepaths used around helper functions
+script_directory = os.path.dirname(os.path.realpath(__file__))
+parent_directory = os.path.dirname(script_directory)
+watched_folder = os.path.join(parent_directory, "watched")  
+data_folder = os.path.join(parent_directory, "data")  
+users_filepath = os.path.join(data_folder, "user_ids.json")
+
+def get_users():
     try:
         with open(users_filepath, "r") as users_file:   
-            
-            
+            content = users_file.read()
+            user_data = json.loads(content)
+            return user_data
+
+    except FileNotFoundError:
+        print("No users currently created. Creating corresponding data folders with no users...")
+        # Ensure the directory structure exists
+        if not os.path.exists(data_folder):
+            os.makedirs(data_folder)
+        with open(users_filepath, "w") as latest_file:
+            json.dump([], latest_file, indent=2, sort_keys=True)
+            print("Latest version generated and saved.")
+
+def store_user(user_id):
+    users_filepath = os.path.join(data_folder, "user_ids.json")
+    try:
+        with open(users_filepath, "r+") as users_file:   
+            content = users_file.read()
+            user_data = json.loads(content)
+            if user_id not in user_data:
+              user_data.append(user_id)
+
+            users_file.seek(0)
+            users_file.truncate() 
+            users_file.flush() 
+            json.dump(user_data, users_file, indent=2, sort_keys=True)
 
     except FileNotFoundError:
         print("No users currently created. Creating corresponding data folders with current user...")
         # Ensure the directory structure exists
         if not os.path.exists(data_folder):
             os.makedirs(data_folder)
-        with open(users_filepath, "w") as latest_file:
-            users = [user_id]
-            json.dump(user_id, latest_file, indent=2, sort_keys=True)
+        with open(users_filepath, "w") as users_file:
+            json.dump([user_id], users_file, indent=2, sort_keys=True)
             print("Latest version generated and saved.")
 
-          
+def remove_user(user_id):
+    users_filepath = os.path.join(data_folder, "user_ids.json")
+    try:
+        with open(users_filepath, "r+") as users_file:   
+            content = users_file.read()
+            user_data = json.loads(content)
+            if user_id not in user_data:
+              user_data.append(user_id)
+
+            users_file.seek(0)
+            users_file.truncate() 
+            users_file.flush() 
+            json.dump(user_data, users_file, indent=2, sort_keys=True)
+
+    except FileNotFoundError:
+        print("No users currently created. Creating corresponding data folders with current user...")
+        # Ensure the directory structure exists
+        if not os.path.exists(data_folder):
+            os.makedirs(data_folder)
+        with open(users_filepath, "w") as users_file:
+            json.dump([user_id], users_file, indent=2, sort_keys=True)
+            print("Latest version generated and saved.")
+       
 def checksum_diff(site, payload):
     """
     Compares the md5 checksum of the current payload with the latest stored payload for a given site.
@@ -38,9 +86,6 @@ def checksum_diff(site, payload):
         True: if md5 checksum differs from the latest stored payload
         False: if md5 checksum is the same as the latest stored payload
     """
-    script_directory = os.path.dirname(os.path.realpath(__file__))
-    parent_directory = os.path.dirname(script_directory)
-    watched_folder = os.path.join(parent_directory, "watched")  
     latest_filepath = os.path.join(watched_folder, f"{site}_latest.json")
     current_filepath = os.path.join(watched_folder, f"{site}_current.json")
 
@@ -48,11 +93,11 @@ def checksum_diff(site, payload):
         with open(latest_filepath, "r+") as latest_file:
             with open(current_filepath, "w") as current_file:
                 # Populate current file to compare checksums
-                json.dump(payload[0], current_file, indent=2)
+                json.dump(payload[0], current_file, indent=2, sort_keys=True)
                 current_file.close()
                 latest_file.seek(0)  # Move cursor to the beginning of the file
                 latest_file.truncate()  # Clear the file
-                json.dump(payload[0], latest_file, indent=2)  # Rewrite latest file
+                json.dump(payload[0], latest_file, indent=2, sort_keys=True)  # Rewrite latest file
                 latest_file.flush()  # Flush changes to disk
 
     except FileNotFoundError:
