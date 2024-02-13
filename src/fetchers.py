@@ -19,6 +19,22 @@ def check_ufsc():
             print(f"No changes detected on url {url}")
             return False
 
+def check_ufsc_antro():
+    url = "https://ppgas.posgrad.ufsc.br/"
+    print(f"Fetching JSON from {url}")
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+        data = soup.find(id='menu-ingresso').text
+        payload = json.dumps(data, sort_keys = True)
+        print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
+        if checksum_diff("ufsc_antro", payload):
+            print(f"Changes detected on url {url}")
+            return True
+        else:
+            print(f"No changes detected on url {url}")
+            return False
+
 def check_unirio():
     url = 'https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado'
     print(f"Fetching JSON from {url}")

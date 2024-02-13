@@ -1,6 +1,6 @@
 import os
 import logging
-from fetchers import check_itau, check_unirio, check_ufsc
+from fetchers import check_itau, check_unirio, check_ufsc, check_ufsc_antro
 from helpers import get_users, store_user, remove_user
 from dotenv import load_dotenv
 from telegram import Update
@@ -90,6 +90,10 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if check_ufsc():
         diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
+        update_messages.append(f"{diffed_url}")
+    
+    if check_ufsc_antro():
+        diffed_url = "https://ppgas.posgrad.ufsc.br/"
         update_messages.append(f"{diffed_url}")
 
     if check_unirio():
