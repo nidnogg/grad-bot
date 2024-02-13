@@ -58,7 +58,7 @@ def check_itau():
 
     if response.status_code == 200:
         data = response.json()  # Retrieve JSON response
-        payload = data
+        payload = data[0]
         print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
         if checksum_diff("itaucultural", payload):
             print(f"Changes detected on url {url}")

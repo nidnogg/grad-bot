@@ -82,37 +82,25 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "Scanning for updates...",
     )
+    update_messages = ['&#10071; <b>Updates found on:</b>']
+
     if check_itau():
         diffed_url = "https://escola.itaucultural.org.br/mediados"
-        await update.message.reply_text(
-            f"&#10071; <b>Updates found on:</b> {diffed_url}", parse_mode="HTML"
-        )
-    else:
-        diffed_url = "https://escola.itaucultural.org.br/mediados"
-        await update.message.reply_text(
-            f"&#9203; <b>No updates found on {diffed_url}</b>", parse_mode="HTML"
-        )
+        update_messages.append(f"{diffed_url}")
+
     if check_ufsc():
         diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
-        await update.message.reply_text(
-            f"&#10071; <b>Updates found on:</b> {diffed_url}", parse_mode="HTML"
-        )
-    else:
-        diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
-        await update.message.reply_text(
-            f"&#9203; <b>No updates found on {diffed_url}</b>", parse_mode="HTML"
-        )
+        update_messages.append(f"{diffed_url}")
+
     if check_unirio():
         diffed_url = "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado"
-        await update.message.reply_text(
-            f"&#10071; <b>Updates found on:</b> {diffed_url}", parse_mode="HTML"
-        )
+        update_messages.append(f"{diffed_url}")
+
+    if len(update_messages) > 1:
+        combined_message = "&#10;&#13;".join(update_messages)
+        await update.message.reply_text(combined_message, parse_mode="HTML")
     else:
-        diffed_url = "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado"
-        await update.message.reply_text(
-            f"&#9203; <b>No updates found on {diffed_url}</b>", parse_mode="HTML"
-        )
-    pass
+        await update.message.reply_text("&#9203; <b>No updates found.</b>", parse_mode="HTML")
 
 
 async def send_message_to_subscribers(bot, message):
