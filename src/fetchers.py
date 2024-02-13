@@ -1,8 +1,41 @@
 from bs4 import BeautifulSoup
 import requests
+import json
 from helpers import checksum_diff
+
+def check_ufsc():
+    url = 'https://pgcin.ufsc.br/processos-seletivos/'
+    print(f"Fetching JSON from {url}")
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+        data = soup.find(id='menu-processo-seletivo').text
+        payload = json.dumps(data, sort_keys = True)
+        print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
+        if checksum_diff("ufsc", payload):
+            print(f"Changes detected on url {url}")
+            return True
+        else:
+            print(f"No changes detected on url {url}")
+            return False
+
+def check_unirio():
+    url = 'https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado'
+    print(f"Fetching JSON from {url}")
+    response = requests.get(url)
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+        data = soup.find(id='content-core').text
+        payload = json.dumps(data, sort_keys = True)
+        print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
+        if checksum_diff("unirio", payload):
+            print(f"Changes detected on url {url}")
+            return True
+        else:
+            print(f"No changes detected on url {url}")
+            return False
+
 def check_itau():
-    print("Fetching from itau...")
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0",
         "Accept": "application/json, text/plain, */*",

@@ -97,7 +97,7 @@ def checksum_diff(site, payload):
         with open(latest_filepath, "r") as latest_file:
             with open(current_filepath, "w") as current_file:
                 # Populate current file to compare checksums
-                json.dump(payload[0], current_file, indent=2, sort_keys=True)
+                json.dump(payload, current_file, indent=2, sort_keys=True)
                 current_file.close()
                 
     except FileNotFoundError:
@@ -122,7 +122,7 @@ def checksum_diff(site, payload):
         )
         print("Replacing latest file")
         with open(latest_filepath, "w") as latest_file:
-            json.dump(payload[0], latest_file, indent=2, sort_keys=True)
+            json.dump(payload, latest_file, indent=2, sort_keys=True)
             latest_file.close()
         return True
     else:

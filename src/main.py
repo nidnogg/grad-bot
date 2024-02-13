@@ -1,6 +1,6 @@
 import os
 import logging
-from fetchers import check_itau
+from fetchers import check_itau, check_unirio, check_ufsc
 from helpers import get_users, store_user, remove_user
 from dotenv import load_dotenv
 from telegram import Update
@@ -89,6 +89,26 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         )
     else:
         diffed_url = "https://escola.itaucultural.org.br/mediados"
+        await update.message.reply_text(
+            f"&#9203; <b>No updates found on {diffed_url}</b>", parse_mode="HTML"
+        )
+    if check_ufsc():
+        diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
+        await update.message.reply_text(
+            f"&#10071; <b>Updates found on:</b> {diffed_url}", parse_mode="HTML"
+        )
+    else:
+        diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
+        await update.message.reply_text(
+            f"&#9203; <b>No updates found on {diffed_url}</b>", parse_mode="HTML"
+        )
+    if check_unirio():
+        diffed_url = "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado"
+        await update.message.reply_text(
+            f"&#10071; <b>Updates found on:</b> {diffed_url}", parse_mode="HTML"
+        )
+    else:
+        diffed_url = "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado"
         await update.message.reply_text(
             f"&#9203; <b>No updates found on {diffed_url}</b>", parse_mode="HTML"
         )
