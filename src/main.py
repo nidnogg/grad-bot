@@ -144,10 +144,29 @@ def main():
         logger.info("Triggering scan job")
         # Checks go here
         ################################################################
+        update_messages = ['&#10071; <b>Updates found on:</b>']
+
         if check_itau():
             diffed_url = "https://escola.itaucultural.org.br/mediados"
+            update_messages.append(f"{diffed_url}")
+
+        if check_ufsc():
+            diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
+            update_messages.append(f"{diffed_url}")
+        
+        if check_ufsc_antro():
+            diffed_url = "https://ppgas.posgrad.ufsc.br/"
+            update_messages.append(f"{diffed_url}")
+
+        if check_unirio():
+            diffed_url = "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado"
+            update_messages.append(f"{diffed_url}")
+
+        if len(update_messages) > 1:
+            combined_message = "&#10;&#13;".join(update_messages)
+            await update.message.reply_text(combined_message, parse_mode="HTML")
             await send_message_to_subscribers(
-                app.bot, f"&#10071;<b>Updates found on: </b>{diffed_url}"
+                app.bot, f"{combined_message}"
             )
         # End of checks
         ################################################################
