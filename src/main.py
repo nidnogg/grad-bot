@@ -164,7 +164,6 @@ def main():
 
         if len(update_messages) > 1:
             combined_message = "&#10;&#13;".join(update_messages)
-            await update.message.reply_text(combined_message, parse_mode="HTML")
             await send_message_to_subscribers(
                 app.bot, f"{combined_message}"
             )
