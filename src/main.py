@@ -2,6 +2,7 @@ import os
 import logging
 from fetchers import check_itau, check_unirio, check_ufsc, check_ufsc_antro
 from helpers import get_users, store_user, remove_user
+from datetime import date
 from dotenv import load_dotenv
 from telegram import Update
 from telegram.ext import (
@@ -82,7 +83,8 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "Scanning for updates...",
     )
-    update_messages = ['&#10071; <b>Updates found on:</b>']
+    cur_date = date.today().strftime("%B %d, %Y")
+    update_messages = [f'&#10071; <b>Updates found on (#{cur_date}):</b>']
 
     if check_itau():
         diffed_url = "https://escola.itaucultural.org.br/mediados"
@@ -104,7 +106,8 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         combined_message = "&#10;&#13;".join(update_messages)
         await update.message.reply_text(combined_message, parse_mode="HTML")
     else:
-        await update.message.reply_text("&#9203; <b>No updates found.</b>", parse_mode="HTML")
+        cur_date = date.today().strftime("%B %d, %Y")
+        await update.message.reply_text(f"&#9203; <b>No updates found ({cur_date}).</b>", parse_mode="HTML")
 
 
 async def send_message_to_subscribers(bot, message):
@@ -144,7 +147,8 @@ def main():
         logger.info("Triggering scan job")
         # Checks go here
         ################################################################
-        update_messages = ['&#10071; <b>Updates found on:</b>']
+        cur_date = date.today().strftime("%B %d, %Y")
+        update_messages = [f'&#10071; <b>Updates found on (#{cur_date}):</b>']
 
         if check_itau():
             diffed_url = "https://escola.itaucultural.org.br/mediados"
