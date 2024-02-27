@@ -1,9 +1,15 @@
 # Data folder, for storing user IDs atm
 data/**
 data
+
 # Watched folder, for checking latest versions
 watched/**
 watched
+
+# env, for project env (currently titled grad-env)
+env/**
+env
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
