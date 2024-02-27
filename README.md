@@ -21,8 +21,10 @@ Alternatively, for PowerShell:
 env\grad-env\Scripts\activate     
 ```
 
-This is collected into an install script if you named it `grad-env` under `env`.
+This is collected into an execution script titled `run.sh` if you placed the virtual environment as `grad-env` under `env`
+
+Make sure you can run it by exectuing the following:
 ```bash
-./run.sh
+chmod +x run.sh
 ```
 
