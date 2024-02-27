@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  grad-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: grad-bot
+    container_name: grad-bot
+    ports:
+      - "8080:8080"  # Adjust the port mapping as needed
+    restart: always  # Restart policy, adjust as needed
