@@ -10,7 +10,10 @@ def check_ufsc():
         response = requests.get(url)
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "html.parser")
-            data = soup.find(id='menu-processo-seletivo').text
+            data_node = soup.find(id='menu-processo-seletivo')
+            if data_node is None:
+                data_node = soup.find(id='menu--processo-seletivo')
+            data = data_node.text
             payload = json.dumps(data, sort_keys = True)
             print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
             if checksum_diff("ufsc", payload):
@@ -20,7 +23,7 @@ def check_ufsc():
                 print(f"No changes detected on url {url}")
                 return False
     except Exception:
-        print(f"Changes detected on url {url}, routine breaking")
+        print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
         return True
 
 def check_ufsc_antro():
@@ -30,7 +33,10 @@ def check_ufsc_antro():
         response = requests.get(url)
         if response.status_code == 200:
             soup = BeautifulSoup(response.text, "html.parser")
-            data = soup.find(id='menu-ingresso').text
+            data_node = soup.find(id='menu-ingresso')
+            if data_node is None:
+                data_node = soup.find(id='menu--ingresso')
+            data = data_node.text
             payload = json.dumps(data, sort_keys = True)
             print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
             if checksum_diff("ufsc_antro", payload):
@@ -39,10 +45,11 @@ def check_ufsc_antro():
             else:
                 print(f"No changes detected on url {url}")
                 return False
-    except Exception:
-        print(f"Changes detected on url {url}, routine breaking")
+    except Exception as err:
+        print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
+        print(f"Reason: {err}")
         return True
-
+    
 def check_unirio():
     try:
         url = 'https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado'
@@ -59,8 +66,9 @@ def check_unirio():
             else:
                 print(f"No changes detected on url {url}")
                 return False
-    except Exception:
-        print(f"Changes detected on url {url}, routine breaking")
+    except Exception as err:
+        print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
+        print(f"Error: {err}")
         return True
 
 def check_itau():
@@ -102,3 +110,7 @@ def check_itau():
     except Exception:
         print(f"Changes detected on url {url}, routine breaking")
         return True
+    
+# Testing routines
+# check_ufsc()
+# check_ufsc_antro()
