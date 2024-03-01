@@ -110,7 +110,53 @@ def check_itau():
     except Exception:
         print(f"Changes detected on url {url}, routine breaking")
         return True
+
+def check_ufop():
+    try:
+        url = 'https://turismoepatrimonio.ufop.br/processo-seletivo'
+        print(f"Fetching JSON from {url}")
+        response = requests.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            data = soup.find(id='columns').text
+            payload = json.dumps(data, sort_keys = True)
+            print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
+            if checksum_diff("ufop", payload):
+                print(f"Changes detected on url {url}")
+                return True
+            else:
+                print(f"No changes detected on url {url}")
+                return False
+    except Exception as err:
+        print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
+        print(f"Error: {err}")
+        return True
     
+def check_fau():
+    try:
+        url = 'https://pgpp.fau.ufrj.br/'
+        print(f"Fetching JSON from {url}")
+        response = requests.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            data_nodes = soup.find_all("div", {"class": "main row home"})
+            data = ''
+            for node in data_nodes:
+                data += node.text
+            payload = json.dumps(data, sort_keys = True)
+            print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
+            if checksum_diff("fau", payload):
+                print(f"Changes detected on url {url}")
+                return True
+            else:
+                print(f"No changes detected on url {url}")
+                return False
+    except Exception as err:
+        print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
+        print(f"Error: {err}")
+        return True
 # Testing routines
 # check_ufsc()
 # check_ufsc_antro()
+# check_ufop()
+check_fau()
