@@ -155,8 +155,52 @@ def check_fau():
         print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
         print(f"Error: {err}")
         return True
+
+def check_iphan_base():
+    try:
+        url = 'http://portal.iphan.gov.br/pep'
+        print(f"Fetching JSON from {url}")
+        response = requests.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            data = soup.find(id='container2').text
+            payload = json.dumps(data, sort_keys = True)
+            print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
+            if checksum_diff("iphan_base", payload):
+                print(f"Changes detected on url {url}")
+                return True
+            else:
+                print(f"No changes detected on url {url}")
+                return False
+    except Exception as err:
+        print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
+        print(f"Error: {err}")
+        return True
+
+def check_iphan_patri():
+    try:
+        url = 'http://portal.iphan.gov.br/pep/pagina/detalhes/1827'
+        print(f"Fetching JSON from {url}")
+        response = requests.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            data = soup.find(id='master').text
+            payload = json.dumps(data, sort_keys = True)
+            print(f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version.")
+            if checksum_diff("iphan_patri", payload):
+                print(f"Changes detected on url {url}")
+                return True
+            else:
+                print(f"No changes detected on url {url}")
+                return False
+    except Exception as err:
+        print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
+        print(f"Error: {err}")
+        return True  
 # Testing routines
 # check_ufsc()
 # check_ufsc_antro()
 # check_ufop()
-check_fau()
+# check_fau()
+# check_iphan_base()
+# check_iphan_patri()
