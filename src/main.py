@@ -1,6 +1,15 @@
 import os
 import logging
-from fetchers import check_itau, check_unirio, check_ufsc, check_ufsc_antro
+from fetchers import (
+    check_itau,
+    check_unirio,
+    check_ufsc,
+    check_ufsc_antro,
+    check_ufop,
+    check_fau,
+    check_iphan_base,
+    check_iphan_patri,
+)
 from helpers import get_users, store_user, remove_user
 from datetime import date
 from dotenv import load_dotenv
@@ -25,10 +34,16 @@ logger = logging.getLogger(__name__)
 # List to store subscribed user chat IDs
 subscribed_users = get_users()
 
-# Watched websites
+# Used in start command
 watched_websites = [
     "https://escola.itaucultural.org.br/mediados",
-    "https://escola.itaucultural.org.br/mediados_test",
+    "https://pgcin.ufsc.br/processos-seletivos/",
+    "https://ppgas.posgrad.ufsc.br/",
+    "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado",
+    "https://turismoepatrimonio.ufop.br/processo-seletivo",
+    "https://pgpp.fau.ufrj.br/",
+    "http://portal.iphan.gov.br/pep",
+    "http://portal.iphan.gov.br/pep/pagina/detalhes/1827",
 ]
 
 available_commands = ["/start", "/subscribe", "/unsubscribe", "/help", "/scan"]
@@ -84,7 +99,7 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "Scanning for updates...",
     )
     cur_date = date.today().strftime("%B %d, %Y")
-    update_messages = [f'&#10071; <b>Updates found on (#{cur_date}):</b>']
+    update_messages = [f"&#10071; <b>Updates found on (#{cur_date}):</b>"]
 
     if check_itau():
         diffed_url = "https://escola.itaucultural.org.br/mediados"
@@ -93,7 +108,7 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if check_ufsc():
         diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
         update_messages.append(f"{diffed_url}")
-    
+
     if check_ufsc_antro():
         diffed_url = "https://ppgas.posgrad.ufsc.br/"
         update_messages.append(f"{diffed_url}")
@@ -102,12 +117,30 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         diffed_url = "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado"
         update_messages.append(f"{diffed_url}")
 
+    if check_ufop():
+        diffed_url = "https://turismoepatrimonio.ufop.br/processo-seletivo"
+        update_messages.append(f"{diffed_url}")
+
+    if check_fau():
+        diffed_url = "https://pgpp.fau.ufrj.br/"
+        update_messages.append(f"{diffed_url}")
+
+    if check_iphan_base():
+        diffed_url = "http://portal.iphan.gov.br/pep"
+        update_messages.append(f"{diffed_url}")
+
+    if check_iphan_patri():
+        diffed_url = "http://portal.iphan.gov.br/pep/pagina/detalhes/1827"
+        update_messages.append(f"{diffed_url}")
+
     if len(update_messages) > 1:
         combined_message = "&#10;&#13;".join(update_messages)
         await update.message.reply_text(combined_message, parse_mode="HTML")
     else:
         cur_date = date.today().strftime("%B %d, %Y")
-        await update.message.reply_text(f"&#9203; <b>No updates found ({cur_date}).</b>", parse_mode="HTML")
+        await update.message.reply_text(
+            f"&#9203; <b>No updates found ({cur_date}).</b>", parse_mode="HTML"
+        )
 
 
 async def send_message_to_subscribers(bot, message):
@@ -148,7 +181,7 @@ def main():
         # Checks go here
         ################################################################
         cur_date = date.today().strftime("%B %d, %Y")
-        update_messages = [f'&#10071; <b>Updates found on (#{cur_date}):</b>']
+        update_messages = [f"&#10071; <b>Updates found on (#{cur_date}):</b>"]
 
         if check_itau():
             diffed_url = "https://escola.itaucultural.org.br/mediados"
@@ -157,7 +190,7 @@ def main():
         if check_ufsc():
             diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
             update_messages.append(f"{diffed_url}")
-        
+
         if check_ufsc_antro():
             diffed_url = "https://ppgas.posgrad.ufsc.br/"
             update_messages.append(f"{diffed_url}")
@@ -168,16 +201,15 @@ def main():
 
         if len(update_messages) > 1:
             combined_message = "&#10;&#13;".join(update_messages)
-            await send_message_to_subscribers(
-                app.bot, f"{combined_message}"
-            )
+            await send_message_to_subscribers(app.bot, f"{combined_message}")
         # End of checks
         ################################################################
         pass
+
     # Schedule scan jobs
     app.job_queue.run_once(scan_job, 20)
     app.job_queue.run_repeating(scan_job, 3600)
-    
+
     # Starts and runs the bot until Ctrl-C is pressed
     app.run_polling(allowed_updates=Update.ALL_TYPES)
 

@@ -99,7 +99,7 @@ def checksum_diff(site, payload):
                 # Populate current file to compare checksums
                 json.dump(payload, current_file, indent=2, sort_keys=True)
                 current_file.close()
-                
+
     except FileNotFoundError:
         print("Currently not watched. Generating latest version...")
         # Ensure the directory structure exists
