@@ -81,7 +81,8 @@ def check_unirio():
         return True
 
 
-def check_itau():
+# TO-DO remove
+def check_itau_deprecated():
     try:
         headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:121.0) Gecko/20100101 Firefox/121.0",
@@ -98,14 +99,16 @@ def check_itau():
             "If-None-Match": 'W/"a535e7011691118f7a9ece9cf7178f13"',
         }
 
-        url = "https://lms.itaucultural.org.br/api/v1/courses?page=1&per_page=24&course_type=with_mediator"
+        url = "https://lms.itaucultural.org.br/api/v1//courses?page=1&per_page=24&course_type=with_mediator"
         print("https://escola.itaucultural.org.br/")
         print("Fetching JSON from ", url)
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
             data = response.json()  # Retrieve JSON response
-            payload = data[0]
+            # payload = data[0]
+            payload = json.dumps(data[0], sort_keys=True)
+            print(payload)
             print(
                 f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version."
             )
@@ -121,6 +124,34 @@ def check_itau():
             return True
     except Exception:
         print(f"Changes detected on url {url}, routine breaking")
+        return True
+
+
+def check_itau():
+    try:
+        url = "https://escola.itaucultural.org.br/mediados"
+        print(f"Fetching JSON from {url}")
+        response = requests.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+
+            data_nodes = soup.find_all("div", {"class": "courses index"})
+            data = ""
+            for node in data_nodes:
+                data += node.text
+            payload = json.dumps(data, sort_keys=True)
+            print(
+                f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version."
+            )
+            if checksum_diff("itau", payload):
+                print(f"Changes detected on url {url}")
+                return True
+            else:
+                print(f"No changes detected on url {url}")
+                return False
+    except Exception as err:
+        print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
+        print(f"Error: {err}")
         return True
 
 
@@ -224,6 +255,7 @@ def check_iphan_patri():
 
 
 # Testing routines
+# check_itau()
 # check_ufsc()
 # check_ufsc_antro()
 # check_ufop()
