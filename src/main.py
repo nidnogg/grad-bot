@@ -209,6 +209,8 @@ def main():
     # Schedule scan jobs
     app.job_queue.run_once(scan_job, 20)
     app.job_queue.run_repeating(scan_job, 3600)
+    # For high anxiety intervals
+    # app.job_queue.run_repeating(scan_job, 600)
 
     # Starts and runs the bot until Ctrl-C is pressed
     app.run_polling(allowed_updates=Update.ALL_TYPES)
