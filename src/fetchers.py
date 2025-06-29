@@ -254,6 +254,30 @@ def check_iphan_patri():
         return True
 
 
+def check_sead_ufscar():
+    try:
+        url = "https://www.sead.ufscar.br/pt-br/processo-seletivo"
+        print(f"Fetching JSON from {url}")
+        response = requests.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            data = soup.find(id="content").text
+            payload = json.dumps(data, sort_keys=True)
+            print(
+                f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version."
+            )
+            if checksum_diff("sead_ufscar", payload):
+                print(f"Changes detected on url {url}")
+                return True
+            else:
+                print(f"No changes detected on url {url}")
+                return False
+    except Exception as err:
+        print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
+        print(f"Error: {err}")
+        return True
+
+
 # Testing routines
 # check_itau()
 # check_ufsc()
@@ -262,3 +286,4 @@ def check_iphan_patri():
 # check_fau()
 # check_iphan_base()
 # check_iphan_patri()
+# check_sead_ufscar()

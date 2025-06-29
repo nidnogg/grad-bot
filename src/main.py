@@ -1,14 +1,15 @@
 import os
 import logging
 from fetchers import (
-    check_itau,
-    check_unirio,
-    check_ufsc,
-    check_ufsc_antro,
-    check_ufop,
-    check_fau,
-    check_iphan_base,
-    check_iphan_patri,
+    check_sead_ufscar,
+    # check_itau,
+    # check_unirio,
+    # check_ufsc,
+    # check_ufsc_antro,
+    # check_ufop,
+    # check_fau,
+    # check_iphan_base,
+    # check_iphan_patri,
 )
 from helpers import get_users, store_user, remove_user
 from datetime import date
@@ -36,14 +37,15 @@ subscribed_users = get_users()
 
 # Used in start command
 watched_websites = [
-    "https://escola.itaucultural.org.br/mediados",
-    "https://pgcin.ufsc.br/processos-seletivos/",
-    "https://ppgas.posgrad.ufsc.br/",
-    "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado",
-    "https://turismoepatrimonio.ufop.br/processo-seletivo",
-    "https://pgpp.fau.ufrj.br/",
-    "http://portal.iphan.gov.br/pep",
-    "http://portal.iphan.gov.br/pep/pagina/detalhes/1827",
+    "https://www.sead.ufscar.br/pt-br/processo-seletivo",
+    # "https://escola.itaucultural.org.br/mediados",
+    # "https://pgcin.ufsc.br/processos-seletivos/",
+    # "https://ppgas.posgrad.ufsc.br/",
+    # "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado",
+    # "https://turismoepatrimonio.ufop.br/processo-seletivo",
+    # "https://pgpp.fau.ufrj.br/",
+    # "http://portal.iphan.gov.br/pep",
+    # "http://portal.iphan.gov.br/pep/pagina/detalhes/1827",
 ]
 
 available_commands = ["/start", "/subscribe", "/unsubscribe", "/help", "/scan"]
@@ -101,37 +103,41 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     cur_date = date.today().strftime("%B %d, %Y")
     update_messages = [f"&#10071; <b>Updates found on (#{cur_date}):</b>"]
 
-    if check_itau():
-        diffed_url = "https://escola.itaucultural.org.br/mediados"
+    if check_sead_ufscar():
+        diffed_url = "https://www.sead.ufscar.br/pt-br/processo-seletivo"
         update_messages.append(f"{diffed_url}")
 
-    if check_ufsc():
-        diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
-        update_messages.append(f"{diffed_url}")
+    # if check_itau():
+    #     diffed_url = "https://escola.itaucultural.org.br/mediados"
+    #     update_messages.append(f"{diffed_url}")
 
-    if check_ufsc_antro():
-        diffed_url = "https://ppgas.posgrad.ufsc.br/"
-        update_messages.append(f"{diffed_url}")
+    # if check_ufsc():
+    #     diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
+    #     update_messages.append(f"{diffed_url}")
 
-    if check_unirio():
-        diffed_url = "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado"
-        update_messages.append(f"{diffed_url}")
+    # if check_ufsc_antro():
+    #     diffed_url = "https://ppgas.posgrad.ufsc.br/"
+    #     update_messages.append(f"{diffed_url}")
 
-    if check_ufop():
-        diffed_url = "https://turismoepatrimonio.ufop.br/processo-seletivo"
-        update_messages.append(f"{diffed_url}")
+    # if check_unirio():
+    #     diffed_url = "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado"
+    #     update_messages.append(f"{diffed_url}")
 
-    if check_fau():
-        diffed_url = "https://pgpp.fau.ufrj.br/"
-        update_messages.append(f"{diffed_url}")
+    # if check_ufop():
+    #     diffed_url = "https://turismoepatrimonio.ufop.br/processo-seletivo"
+    #     update_messages.append(f"{diffed_url}")
 
-    if check_iphan_base():
-        diffed_url = "http://portal.iphan.gov.br/pep"
-        update_messages.append(f"{diffed_url}")
+    # if check_fau():
+    #     diffed_url = "https://pgpp.fau.ufrj.br/"
+    #     update_messages.append(f"{diffed_url}")
 
-    if check_iphan_patri():
-        diffed_url = "http://portal.iphan.gov.br/pep/pagina/detalhes/1827"
-        update_messages.append(f"{diffed_url}")
+    # if check_iphan_base():
+    #     diffed_url = "http://portal.iphan.gov.br/pep"
+    #     update_messages.append(f"{diffed_url}")
+
+    # if check_iphan_patri():
+    #     diffed_url = "http://portal.iphan.gov.br/pep/pagina/detalhes/1827"
+    #     update_messages.append(f"{diffed_url}")
 
     if len(update_messages) > 1:
         combined_message = "&#10;&#13;".join(update_messages)
@@ -183,21 +189,25 @@ def main():
         cur_date = date.today().strftime("%B %d, %Y")
         update_messages = [f"&#10071; <b>Updates found on (#{cur_date}):</b>"]
 
-        if check_itau():
-            diffed_url = "https://escola.itaucultural.org.br/mediados"
+        if check_sead_ufscar():
+            diffed_url = "https://www.sead.ufscar.br/pt-br/processo-seletivo"
             update_messages.append(f"{diffed_url}")
 
-        if check_ufsc():
-            diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
-            update_messages.append(f"{diffed_url}")
+        # if check_itau():
+        #     diffed_url = "https://escola.itaucultural.org.br/mediados"
+        #     update_messages.append(f"{diffed_url}")
 
-        if check_ufsc_antro():
-            diffed_url = "https://ppgas.posgrad.ufsc.br/"
-            update_messages.append(f"{diffed_url}")
+        # if check_ufsc():
+        #     diffed_url = "https://pgcin.ufsc.br/processos-seletivos/"
+        #     update_messages.append(f"{diffed_url}")
 
-        if check_unirio():
-            diffed_url = "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado"
-            update_messages.append(f"{diffed_url}")
+        # if check_ufsc_antro():
+        #     diffed_url = "https://ppgas.posgrad.ufsc.br/"
+        #     update_messages.append(f"{diffed_url}")
+
+        # if check_unirio():
+        #     diffed_url = "https://www.unirio.br/ppg-pmus/processos-seletivos-mestrado"
+        #     update_messages.append(f"{diffed_url}")
 
         if len(update_messages) > 1:
             combined_message = "&#10;&#13;".join(update_messages)
