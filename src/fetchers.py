@@ -278,6 +278,34 @@ def check_sead_ufscar():
         return True
 
 
+def check_instituto_americas():
+    try:
+        url = "https://www.institutoamericas.org/estudos-abertos/?tax_area-do-estudo=cancer-endometrial&tax_page_category=oncologia&tax_local=rio-de-janeiro&unfilter=1"
+        print(f"Fetching JSON from {url}")
+        response = requests.get(url)
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.text, "html.parser")
+            data_node = soup.find("div", {"class": "isotope-wrapper grid-wrapper half-gutter col-lg-12"})
+            if data_node is None:
+                print(f"Could not find isotope-wrapper div on {url}")
+                return True
+            data = data_node.text
+            payload = json.dumps(data, sort_keys=True)
+            print(
+                f"Successfully fetched payload data from {url}\nNow comparing payload with latest local version."
+            )
+            if checksum_diff("instituto_americas", payload):
+                print(f"Changes detected on url {url}")
+                return True
+            else:
+                print(f"No changes detected on url {url}")
+                return False
+    except Exception as err:
+        print(f"WARNING: ROUTINE BREAKING. Changes detected on url {url}")
+        print(f"Error: {err}")
+        return True
+
+
 # Testing routines
 # check_itau()
 # check_ufsc()
