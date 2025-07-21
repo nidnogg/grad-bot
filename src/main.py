@@ -2,6 +2,7 @@ import os
 import logging
 from fetchers import (
     check_sead_ufscar,
+    check_instituto_americas,
     # check_itau,
     # check_unirio,
     # check_ufsc,
@@ -38,6 +39,7 @@ subscribed_users = get_users()
 # Used in start command
 watched_websites = [
     "https://www.sead.ufscar.br/pt-br/processo-seletivo",
+    "https://www.institutoamericas.org/estudos-abertos/?tax_area-do-estudo=cancer-endometrial&tax_page_category=oncologia&tax_local=rio-de-janeiro&unfilter=1",
     # "https://escola.itaucultural.org.br/mediados",
     # "https://pgcin.ufsc.br/processos-seletivos/",
     # "https://ppgas.posgrad.ufsc.br/",
@@ -105,6 +107,10 @@ async def scan(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     if check_sead_ufscar():
         diffed_url = "https://www.sead.ufscar.br/pt-br/processo-seletivo"
+        update_messages.append(f"{diffed_url}")
+
+    if check_instituto_americas():
+        diffed_url = "https://www.institutoamericas.org/estudos-abertos/?tax_area-do-estudo=cancer-endometrial&tax_page_category=oncologia&tax_local=rio-de-janeiro&unfilter=1"
         update_messages.append(f"{diffed_url}")
 
     # if check_itau():
@@ -191,6 +197,10 @@ def main():
 
         if check_sead_ufscar():
             diffed_url = "https://www.sead.ufscar.br/pt-br/processo-seletivo"
+            update_messages.append(f"{diffed_url}")
+
+        if check_instituto_americas():
+            diffed_url = "https://www.institutoamericas.org/estudos-abertos/?tax_area-do-estudo=cancer-endometrial&tax_page_category=oncologia&tax_local=rio-de-janeiro&unfilter=1"
             update_messages.append(f"{diffed_url}")
 
         # if check_itau():
